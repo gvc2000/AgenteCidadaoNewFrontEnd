@@ -589,7 +589,7 @@
                     // Verificar autenticacao
                     const authCheck = await api.get('/api/auth/check');
                     if (!authCheck.authenticated) {
-                        window.location.href = '/login';
+                        window.location.href = '/login?return=/admin';
                         return;
                     }
 
@@ -616,7 +616,7 @@
                 } catch (err) {
                     console.error('Erro ao carregar dados:', err);
                     if (err.message.includes('Nao autenticado')) {
-                        window.location.href = '/login';
+                        window.location.href = '/login?return=/admin';
                     } else {
                         setError(err.message);
                         setLoading(false);
