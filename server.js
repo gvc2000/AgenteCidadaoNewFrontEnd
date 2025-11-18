@@ -7,6 +7,9 @@ const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy - necessario para Railway/Heroku
+app.set('trust proxy', 1);
+
 // Log startup information
 console.log('Iniciando servidor...');
 console.log(`Diretorio base: ${__dirname}`);
@@ -27,6 +30,7 @@ const sessionConfig = {
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
+    sameSite: 'lax',
     maxAge: 24 * 60 * 60 * 1000 // 24 horas
   }
 };
