@@ -881,6 +881,8 @@
             const [inputValue, setInputValue] = useState('');
             const [isLoading, setIsLoading] = useState(false);
             const [language, setLanguage] = useState('pt');
+            const [isAuthenticated, setIsAuthenticated] = useState(false);
+            const [currentUser, setCurrentUser] = useState(null);
             const messagesEndRef = useRef(null);
             const inputRef = useRef(null);
 
@@ -893,6 +895,41 @@
             useEffect(() => {
                 scrollToBottom();
             }, [messages]);
+
+            // Verificar autenticacao ao carregar
+            useEffect(() => {
+                const checkAuth = async () => {
+                    try {
+                        const response = await fetch('/api/auth/check', { credentials: 'include' });
+                        const data = await response.json();
+                        if (data.authenticated) {
+                            setIsAuthenticated(true);
+                            // Buscar dados do usuario
+                            const userResponse = await fetch('/api/auth/me', { credentials: 'include' });
+                            if (userResponse.ok) {
+                                const userData = await userResponse.json();
+                                setCurrentUser(userData.user);
+                            }
+                        }
+                    } catch (error) {
+                        console.log('Auth check failed');
+                    }
+                };
+                checkAuth();
+            }, []);
+
+            const handleLogout = async () => {
+                try {
+                    await fetch('/api/auth/logout', {
+                        method: 'POST',
+                        credentials: 'include'
+                    });
+                    setIsAuthenticated(false);
+                    setCurrentUser(null);
+                } catch (error) {
+                    console.error('Logout failed:', error);
+                }
+            };
 
             const handleSend = async () => {
                 if (!inputValue.trim() || isLoading) return;
@@ -1058,6 +1095,9 @@
                         t={t}
                         language={language}
                         onLanguageChange={setLanguage}
+                        isAuthenticated={isAuthenticated}
+                        currentUser={currentUser}
+                        onLogout={handleLogout}
                     />
 
                     <div className="main-container">
@@ -1108,7 +1148,7 @@
         }
 
         // Componente Main Header
-        function MainHeader({ t, language, onLanguageChange }) {
+        function MainHeader({ t, language, onLanguageChange, isAuthenticated, currentUser, onLogout }) {
             return (
                 <header className="header">
                     <div className="header-content">
@@ -1130,11 +1170,31 @@
                             </div>
                         </div>
 
-                        <LanguageSelector
-                            language={language}
-                            onLanguageChange={onLanguageChange}
-                            t={t}
-                        />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <LanguageSelector
+                                language={language}
+                                onLanguageChange={onLanguageChange}
+                                t={t}
+                            />
+
+                            {isAuthenticated && (
+                                <button
+                                    onClick={onLogout}
+                                    style={{
+                                        padding: '0.5rem 1rem',
+                                        background: '#DC2626',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        cursor: 'pointer',
+                                        fontSize: '0.875rem',
+                                        fontWeight: '600'
+                                    }}
+                                >
+                                    Sair
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </header>
             );
