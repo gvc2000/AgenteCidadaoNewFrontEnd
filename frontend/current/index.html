@@ -641,12 +641,12 @@
         /* Responsivo */
         @media (max-width: 1024px) {
             .main-container {
-                grid-template-columns: 1fr;
+                grid-template-columns: 240px 1fr;
                 padding: 1rem;
             }
 
             .sidebar {
-                display: none;
+                display: flex;
             }
 
             .message-content {
@@ -659,6 +659,16 @@
         }
 
         @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+
+            .sidebar {
+                display: flex;
+                order: -1;
+            }
+
             .gov-header-content {
                 padding: 0 1rem;
             }
